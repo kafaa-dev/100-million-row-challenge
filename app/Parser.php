@@ -12,10 +12,10 @@ final class Parser
         $output = [];
 
         $fp = fopen($inputPath, 'r');
-        while ($data = fgets($fp)) {
-            $comma = strpos($data, ',');
-            $path = substr($data, 19, $comma - 19);
-            $date = substr($data, $comma + 1, 10);
+        while ($line = fgets($fp)) {
+            $comma = strpos($line, ',');
+            $path = substr($line, 19, $comma - 19);
+            $date = substr($line, $comma + 1, 10);
 
             if (!isset($output[$path])) {
                 $output[$path] = [];
