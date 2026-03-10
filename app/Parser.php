@@ -11,9 +11,9 @@ final class Parser
          */
         $output = [];
 
-        $lines = file($inputPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lines as $line) {
-            [$url, $timestamp] = explode(',', $line, 2);
+        $fp = fopen($inputPath, 'r');
+        while ($data = fgets($fp)) {
+            [$url, $timestamp] = explode(',', $data, 2);
 
             $path = parse_url($url, PHP_URL_PATH);
             $date = substr($timestamp, 0, 10);
@@ -28,6 +28,7 @@ final class Parser
 
             $output[$path][$date]++;
         }
+        fclose($fp);
 
         foreach ($output as &$visits) {
             ksort($visits, SORT_STRING);
