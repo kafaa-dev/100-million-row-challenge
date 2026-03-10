@@ -2,9 +2,6 @@
 
 namespace App;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-
 final class Parser
 {
     public function parse(string $inputPath, string $outputPath): void
@@ -19,7 +16,7 @@ final class Parser
             [$url, $timestamp] = explode(',', $line, 2);
 
             $path = parse_url($url, PHP_URL_PATH);
-            $date = DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $timestamp)->format('Y-m-d');
+            $date = substr($timestamp, 0, 10);
 
             if (!isset($output[$path])) {
                 $output[$path] = [];
