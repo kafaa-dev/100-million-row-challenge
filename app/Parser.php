@@ -13,7 +13,9 @@ final class Parser
 
         $fp = fopen($inputPath, 'r');
         while ($data = fgets($fp)) {
-            [$url, $timestamp] = explode(',', $data, 2);
+            $comma = strpos($data, ',');
+            $url = substr($data, 0, $comma);
+            $timestamp = substr($data, $comma + 1);
 
             $path = parse_url($url, PHP_URL_PATH);
             $date = substr($timestamp, 0, 10);
