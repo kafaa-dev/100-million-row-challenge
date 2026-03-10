@@ -17,10 +17,6 @@ final class Parser
             $path = substr($line, 19, $comma - 19);
             $date = substr($line, $comma + 1, 10);
 
-            if (!isset($output[$path])) {
-                $output[$path] = [];
-            }
-
             if (!isset($output[$path][$date])) {
                 $output[$path][$date] = 0;
             }
