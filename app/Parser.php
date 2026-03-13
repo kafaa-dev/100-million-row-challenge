@@ -6,6 +6,8 @@ final class Parser
 {
     public function parse(string $inputPath, string $outputPath): void
     {
+        gc_disable();
+
         /**
          * @var array<string, array<string, int>>
          */
