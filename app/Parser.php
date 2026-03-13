@@ -13,9 +13,8 @@ final class Parser
 
         $fp = fopen($inputPath, 'r');
         while ($line = fgets($fp)) {
-            $comma = strpos($line, ',');
-            $path = substr($line, 19, $comma - 19);
-            $date = substr($line, $comma + 1, 10);
+            $path = substr($line, 19, -27);
+            $date = substr($line, -26, 10);
 
             if (isset($output[$path][$date])) {
                 $output[$path][$date]++;
