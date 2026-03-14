@@ -22,8 +22,8 @@ final class Parser
         $slugs = array_map(fn (Visit $v) => substr($v->uri, 25), Visit::all());
         $slugCount = count($slugs);
         $slugIds = array_map(fn ($v) => $v * $days, array_flip($slugs));
-        $slugSorted = [];
 
+        $slugSorted = [];
         $fp = fopen($inputPath, 'r');
         stream_set_read_buffer($fp, 0);
         while ($line = fgets($fp)) {
@@ -38,7 +38,6 @@ final class Parser
             }
         }
         fclose($fp);
-
         $slugSorted = array_flip($slugSorted);
 
         $counts = array_fill(0, $slugCount * $days, 0);
