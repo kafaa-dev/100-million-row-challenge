@@ -4,6 +4,28 @@ namespace App;
 
 use App\Commands\Visit;
 
+use function array_fill;
+use function array_flip;
+use function array_map;
+use function count;
+use function date;
+use function fclose;
+use function feof;
+use function fgets;
+use function fopen;
+use function fread;
+use function fseek;
+use function fwrite;
+use function gc_disable;
+use function stream_set_read_buffer;
+use function stream_set_write_buffer;
+use function strlen;
+use function strpos;
+use function strtotime;
+use function substr;
+
+use const SEEK_CUR;
+
 final class Parser
 {
     public function parse(string $inputPath, string $outputPath): void
