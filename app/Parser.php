@@ -45,14 +45,26 @@ final class Parser
 
         $fp = fopen($inputPath, 'r');
         stream_set_read_buffer($fp, 0);
-        while ($line = fgets($fp)) {
-            $slug = substr($line, 25, -27);
-            $date = substr($line, -26, 10);
+        while (!feof($fp)) {
+            $chunk = fread($fp, 1_048_576);
 
-            $s = $slugIds[$slug];
-            $d = $dateIds[$date];
+            $start = 0;
+            while (($pos = strpos($chunk, "\n", $start)) !== false) {
+                $slug = substr($chunk, $start + 25, $pos - $start - 25 - 26);
+                $date = substr($chunk, $pos - 25, 10);
 
-            $counts[$s + $d]++;
+                $s = $slugIds[$slug];
+                $d = $dateIds[$date];
+
+                $counts[$s + $d]++;
+
+                $start = $pos + 1;
+            }
+
+            $leftover = strlen($chunk) - $start;
+            if ($leftover > 0) {
+                fseek($fp, -$leftover, SEEK_CUR);
+            }
         }
         fclose($fp);
 
