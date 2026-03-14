@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Commands\Visit;
-use DateTimeImmutable;
 
 final class Parser
 {
@@ -11,11 +10,11 @@ final class Parser
     {
         gc_disable();
 
-        $epoch = new DateTimeImmutable('2021-02-08');
+        $epoch = strtotime('2021-02-08');
         $days = 1846;
         $dateIds = [];
         for ($i = 0; $i < $days; $i++) {
-            $date = substr($epoch->modify("+$i days")->format('y-m-d'), 1);
+            $date = substr(date('y-m-d', $epoch + $i * 86400), 1);
             $dateIds[$date] = $i;
         }
 
