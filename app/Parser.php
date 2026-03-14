@@ -50,12 +50,11 @@ final class Parser
             }
         }
 
-        $slugs = Visit::all();
-        $slugCount = count($slugs);
         $slugIds = [];
-        foreach ($slugs as $i => $visit) {
+        foreach (Visit::all() as $i => $visit) {
             $slugIds[substr($visit->uri, 28)] = $i * $days;
         }
+        $slugCount = $i + 1;
 
         $slugSorted = [];
         $fp = fopen($inputPath, 'r');
