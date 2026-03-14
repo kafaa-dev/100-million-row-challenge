@@ -39,12 +39,10 @@ final class Parser
                 break;
             }
         }
-        fclose($fp);
         $slugSorted = array_flip($slugSorted);
 
+        fseek($fp, 0);
         $counts = array_fill(0, $slugCount * $days, 0);
-        $fp = fopen($inputPath, 'r');
-        stream_set_read_buffer($fp, 0);
         while (!feof($fp)) {
             $chunk = fread($fp, 1_048_576);
 
