@@ -79,10 +79,7 @@ final class Parser
                 $slug = substr($chunk, $start + 28, $pos - $start - 54);
                 $date = substr($chunk, $pos - 22, 7);
 
-                $s = $slugIds[$slug];
-                $d = $dateIds[$date];
-
-                $counts[$s + $d]++;
+                $counts[$slugIds[$slug] + $dateIds[$date]]++;
 
                 $start = $pos + 1;
             }
