@@ -11,8 +11,8 @@ final class Parser
     {
         gc_disable();
 
-        $epoch = new DateTimeImmutable('2021-01-01');
-        $days = 2191;
+        $epoch = new DateTimeImmutable('2021-02-08');
+        $days = 1846;
         $dateIds = [];
         for ($i = 0; $i < $days; $i++) {
             $date = $epoch->modify("+$i days")->format('Y-m-d');
