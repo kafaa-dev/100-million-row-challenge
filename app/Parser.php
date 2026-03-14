@@ -29,11 +29,23 @@ final class Parser
         $fp = fopen($inputPath, 'r');
         while ($line = fgets($fp)) {
             $slug = substr($line, 25, -27);
-            $date = substr($line, -26, 10);
 
             if (!isset($slugSorted[$slug])) {
                 $slugSorted[$slug] = count($slugSorted);
             }
+
+            if (count($slugSorted) === $slugCount) {
+                break;
+            }
+        }
+        fclose($fp);
+
+        $slugSorted = array_flip($slugSorted);
+
+        $fp = fopen($inputPath, 'r');
+        while ($line = fgets($fp)) {
+            $slug = substr($line, 25, -27);
+            $date = substr($line, -26, 10);
 
             $s = $slugIds[$slug];
             $d = $dateIds[$date];
@@ -41,8 +53,6 @@ final class Parser
             $counts[$s + $d]++;
         }
         fclose($fp);
-
-        $slugSorted = array_flip($slugSorted);
 
         $fp = fopen($outputPath, 'w');
         stream_set_write_buffer($fp, 1_048_576);
