@@ -32,12 +32,22 @@ final class Parser
     {
         gc_disable();
 
-        $epoch = strtotime('2021-02-08');
-        $days = 1846;
         $dateIds = [];
-        for ($i = 0; $i < $days; $i++) {
-            $date = substr(date('y-m-d', $epoch + $i * 86400), 1);
-            $dateIds[$date] = $i;
+        $days = 0;
+        for ($y = 1; $y <= 6; $y++) {
+            for ($m = 1; $m <= 12; $m++) {
+                $ms = $m < 10 ? "0$m" : "$m";
+                $daysInMonth = match ($m) {
+                    4, 6, 9, 11 => 30,
+                    2 => $y === 4 ? 29 : 28,
+                    default => 31,
+                };
+
+                for ($d = 1; $d <= $daysInMonth; $d++) {
+                    $ds = $d < 10 ? "0$d" : "$d";
+                    $dateIds["$y-$ms-$ds"] = $days++;
+                }
+            }
         }
 
         $slugs = Visit::all();
