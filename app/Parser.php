@@ -21,7 +21,10 @@ final class Parser
 
         $slugs = array_map(fn (Visit $v) => substr($v->uri, 25), Visit::all());
         $slugCount = count($slugs);
-        $slugIds = array_map(fn ($v) => $v * $days, array_flip($slugs));
+        $slugIds = [];
+        foreach ($slugs as $i => $slug) {
+            $slugIds[$slug] = $i * $days;
+        }
 
         $slugSorted = [];
         $fp = fopen($inputPath, 'r');
