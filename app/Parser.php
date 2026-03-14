@@ -40,11 +40,11 @@ final class Parser
             $dateIds[$date] = $i;
         }
 
-        $slugs = array_map(fn (Visit $v) => substr($v->uri, 25), Visit::all());
+        $slugs = Visit::all();
         $slugCount = count($slugs);
         $slugIds = [];
-        foreach ($slugs as $i => $slug) {
-            $slugIds[substr($slug, 3)] = $i * $days;
+        foreach ($slugs as $i => $visit) {
+            $slugIds[substr($visit->uri, 28)] = $i * $days;
         }
 
         $slugSorted = [];
