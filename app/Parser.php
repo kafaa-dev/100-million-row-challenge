@@ -27,6 +27,7 @@ final class Parser
         $counts = array_fill(0, $slugCount * $days, 0);
 
         $fp = fopen($inputPath, 'r');
+        stream_set_read_buffer($fp, 0);
         while ($line = fgets($fp)) {
             $slug = substr($line, 25, -27);
 
@@ -43,6 +44,7 @@ final class Parser
         $slugSorted = array_flip($slugSorted);
 
         $fp = fopen($inputPath, 'r');
+        stream_set_read_buffer($fp, 0);
         while ($line = fgets($fp)) {
             $slug = substr($line, 25, -27);
             $date = substr($line, -26, 10);
