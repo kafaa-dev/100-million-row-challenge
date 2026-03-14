@@ -19,42 +19,42 @@ final class Parser
             $dateIds[$date] = $i;
         }
 
-        $paths = array_map(fn (Visit $v) => substr($v->uri, 19), Visit::all());
-        $pathCount = count($paths);
-        $pathIds = array_map(fn ($v) => $v * $days, array_flip($paths));
-        $pathSorted = [];
+        $slugs = array_map(fn (Visit $v) => substr($v->uri, 25), Visit::all());
+        $slugCount = count($slugs);
+        $slugIds = array_map(fn ($v) => $v * $days, array_flip($slugs));
+        $slugSorted = [];
 
-        $counts = array_fill(0, $pathCount * $days, 0);
+        $counts = array_fill(0, $slugCount * $days, 0);
 
         $fp = fopen($inputPath, 'r');
         while ($line = fgets($fp)) {
-            $path = substr($line, 19, -27);
+            $slug = substr($line, 25, -27);
             $date = substr($line, -26, 10);
 
-            if (!isset($pathSorted[$path])) {
-                $pathSorted[$path] = count($pathSorted);
+            if (!isset($slugSorted[$slug])) {
+                $slugSorted[$slug] = count($slugSorted);
             }
 
-            $p = $pathIds[$path];
+            $s = $slugIds[$slug];
             $d = $dateIds[$date];
 
-            $counts[$p + $d]++;
+            $counts[$s + $d]++;
         }
         fclose($fp);
 
-        $pathSorted = array_flip($pathSorted);
+        $slugSorted = array_flip($slugSorted);
 
         $fp = fopen($outputPath, 'w');
         stream_set_write_buffer($fp, 1_048_576);
         fwrite($fp, '{');
-        $firstPath = true;
-        foreach ($pathSorted as $path) {
-            $buffer = $firstPath ? '' : ',';
-            $buffer .= "\n    \"" . str_replace('/', '\/', $path) . '": {';
-            $p = $pathIds[$path];
+        $firstSlug = true;
+        foreach ($slugSorted as $slug) {
+            $buffer = $firstSlug ? '' : ',';
+            $buffer .= "\n    \"\/blog\/$slug\": {";
+            $s = $slugIds[$slug];
             $firstDate = true;
             foreach ($dateIds as $date => $d) {
-                $count = $counts[$p + $d];
+                $count = $counts[$s + $d];
                 if ($count === 0) continue;
                 $buffer .= $firstDate ? '' : ',';
                 $buffer .= "\n        \"$date\": $count";
@@ -64,7 +64,7 @@ final class Parser
             $buffer .= "\n    }";
             fwrite($fp, $buffer);
 
-            $firstPath = false;
+            $firstSlug = false;
         }
         fwrite($fp, "\n}");
         fclose($fp);
