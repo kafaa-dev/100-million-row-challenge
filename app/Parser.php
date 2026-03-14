@@ -15,7 +15,7 @@ final class Parser
         $days = 1846;
         $dateIds = [];
         for ($i = 0; $i < $days; $i++) {
-            $date = $epoch->modify("+$i days")->format('Y-m-d');
+            $date = substr($epoch->modify("+$i days")->format('y-m-d'), 1);
             $dateIds[$date] = $i;
         }
 
@@ -51,7 +51,7 @@ final class Parser
             $start = 0;
             while (($pos = strpos($chunk, "\n", $start)) !== false) {
                 $slug = substr($chunk, $start + 25, $pos - $start - 51);
-                $date = substr($chunk, $pos - 25, 10);
+                $date = substr($chunk, $pos - 22, 7);
 
                 $s = $slugIds[$slug];
                 $d = $dateIds[$date];
@@ -81,7 +81,7 @@ final class Parser
                 $count = $counts[$s + $d];
                 if ($count === 0) continue;
                 $buffer .= $firstDate ? '' : ',';
-                $buffer .= "\n        \"$date\": $count";
+                $buffer .= "\n        \"202$date\": $count";
 
                 $firstDate = false;
             }
