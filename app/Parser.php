@@ -23,7 +23,7 @@ final class Parser
         $slugCount = count($slugs);
         $slugIds = [];
         foreach ($slugs as $i => $slug) {
-            $slugIds[$slug] = $i * $days;
+            $slugIds[substr($slug, 3)] = $i * $days;
         }
 
         $slugSorted = [];
@@ -51,7 +51,7 @@ final class Parser
 
             $start = 0;
             while (($pos = strpos($chunk, "\n", $start)) !== false) {
-                $slug = substr($chunk, $start + 25, $pos - $start - 51);
+                $slug = substr($chunk, $start + 28, $pos - $start - 54);
                 $date = substr($chunk, $pos - 22, 7);
 
                 $s = $slugIds[$slug];
@@ -76,7 +76,7 @@ final class Parser
         foreach ($slugSorted as $slug) {
             $buffer = $firstSlug ? '' : ',';
             $buffer .= "\n    \"\/blog\/$slug\": {";
-            $s = $slugIds[$slug];
+            $s = $slugIds[substr($slug, 3)];
             $firstDate = true;
             foreach ($dateIds as $date => $d) {
                 $count = $counts[$s + $d];
