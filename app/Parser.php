@@ -76,10 +76,7 @@ final class Parser
 
             $start = 0;
             while (($pos = strpos($chunk, "\n", $start)) !== false) {
-                $slug = substr($chunk, $start + 28, $pos - $start - 54);
-                $date = substr($chunk, $pos - 22, 7);
-
-                $counts[$slugIds[$slug] + $dateIds[$date]]++;
+                $counts[$slugIds[substr($chunk, $start + 28, $pos - $start - 54)] + $dateIds[substr($chunk, $pos - 22, 7)]]++;
 
                 $start = $pos + 1;
             }
