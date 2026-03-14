@@ -76,7 +76,8 @@ final class Parser
 
             $start = 0;
             while (($pos = strpos($chunk, "\n", $start)) !== false) {
-                $counts[$slugIds[substr($chunk, $start + 28, $pos - $start - 54)] + $dateIds[substr($chunk, $pos - 22, 7)]]++;
+                $comma = strpos($chunk, ',', $start);
+                $counts[$slugIds[substr($chunk, $start + 28, $comma - $start - 28)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
 
                 $start = $pos + 1;
             }
