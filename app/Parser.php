@@ -50,7 +50,7 @@ final class Parser
 
             $start = 0;
             while (($pos = strpos($chunk, "\n", $start)) !== false) {
-                $slug = substr($chunk, $start + 25, $pos - $start - 25 - 26);
+                $slug = substr($chunk, $start + 25, $pos - $start - 51);
                 $date = substr($chunk, $pos - 25, 10);
 
                 $s = $slugIds[$slug];
