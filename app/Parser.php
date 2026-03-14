@@ -50,14 +50,14 @@ final class Parser
         $firstPath = true;
         foreach ($pathSorted as $path) {
             $buffer = $firstPath ? '' : ',';
-            $buffer .= "\n    " . json_encode($path) . ': {';
+            $buffer .= "\n    \"" . str_replace('/', '\/', $path) . '": {';
             $p = $pathIds[$path];
             $firstDate = true;
             foreach ($dateIds as $date => $d) {
                 $count = $counts[$p + $d];
                 if ($count === 0) continue;
                 $buffer .= $firstDate ? '' : ',';
-                $buffer .= "\n        " . json_encode($date).  ": $count";
+                $buffer .= "\n        \"$date\": $count";
 
                 $firstDate = false;
             }
