@@ -58,7 +58,7 @@ final class Parser
         $fp = fopen($inputPath, 'r');
         stream_set_read_buffer($fp, 0);
 
-        $sample = fread($fp, 106_376);
+        $sample = fread($fp, 131_072);
         $lastNewline = strrpos($sample, "\n");
         $pos = 25;
         while ($pos < $lastNewline) {
