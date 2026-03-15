@@ -8,7 +8,6 @@ use function array_fill;
 use function array_flip;
 use function fclose;
 use function feof;
-use function fgets;
 use function fopen;
 use function fread;
 use function fseek;
