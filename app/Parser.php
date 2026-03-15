@@ -25,10 +25,6 @@ use const SEEK_CUR;
 final class Parser
 {
     private const string URI_PREFIX = 'https://stitcher.io/blog/';
-    private const int URI_PREFIX_LEN = 25;
-    private const int NEWLINE_LEN = 1;
-    private const int COMMA_LEN = 1;
-    private const int DATE_LEN = 25;
 
     public function parse(string $inputPath, string $outputPath): void
     {
@@ -69,7 +65,7 @@ final class Parser
 
         $slugMap = [];
         foreach ($uris as $i => $uri) {
-            $slug = substr($uri, self::URI_PREFIX_LEN);
+            $slug = substr($uri, 25);
             $slugId = $i * $days;
             $slugMap[substr($uri, -$slugKeyLen)] = (strlen($slug) << 20) | $slugId;
         }
@@ -83,11 +79,11 @@ final class Parser
 
         $sample = fread($fp, 181_000);
         $lastNewline = strrpos($sample, "\n");
-        $pos = self::URI_PREFIX_LEN;
+        $pos = 25;
         while ($pos < $lastNewline) {
             $comma = strpos($sample, ',', $pos);
             $slug = substr($sample, $pos, $comma - $pos);
-            $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
+            $pos = $comma + 52;
 
             if (!isset($slugSorted[$slug])) {
                 $slugSorted[$slug] = $slugSortedCount++;
@@ -97,17 +93,17 @@ final class Parser
 
         fseek($fp, 0);
         $counts = array_fill(0, $slugCount * $days, 0);
-        $slugKeyOffset = self::DATE_LEN + self::COMMA_LEN + $slugKeyLen;
+        $slugKeyOffset = $slugKeyLen + 26;
         while (!feof($fp)) {
             $chunk = fread($fp, 1_048_576);
 
             $lastNewline = strrpos($chunk, "\n");
 
             $pos = $lastNewline;
-            while ($pos > self::URI_PREFIX_LEN) {
+            while ($pos > 25) {
                 $s = $slugMap[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
-                $counts[($s & $slugMask) + $dateIds[substr($chunk, $pos - (self::DATE_LEN - 3), 7)]]++;
-                $pos -= self::DATE_LEN + self::COMMA_LEN + ($s >> 20) + self::URI_PREFIX_LEN + self::NEWLINE_LEN;
+                $counts[($s & $slugMask) + $dateIds[substr($chunk, $pos - 22, 7)]]++;
+                $pos -= 52 + ($s >> 20);
             }
 
             $leftover = strlen($chunk) - $lastNewline - 1;
