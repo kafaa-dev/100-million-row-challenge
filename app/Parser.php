@@ -52,9 +52,28 @@ final class Parser
             }
         }
 
+        $uris = array_column(Visit::all(), 'uri');
+
+        $slugKeyLen = 1;
+        while (true) {
+            $keys = [];
+            foreach ($uris as $uri) {
+                $key = substr($uri, -$slugKeyLen);
+                if (isset($keys[$key])) {
+                    $slugKeyLen++; continue 2;
+                }
+                $keys[$key] = true;
+            }
+            break;
+        }
+
         $slugIds = [];
-        foreach (Visit::all() as $i => $visit) {
-            $slugIds[substr($visit->uri, self::URI_PREFIX_LEN)] = $i * $days;
+        $slugLengths = [];
+        foreach ($uris as $i => $uri) {
+            $slug = substr($uri, self::URI_PREFIX_LEN);
+            $slugId = $i * $days;
+            $slugIds[substr($uri, -$slugKeyLen)] = $slugId;
+            $slugLengths[$slugId] = strlen($slug);
         }
         $slugCount = $i + 1;
 
@@ -79,67 +98,17 @@ final class Parser
 
         fseek($fp, 0);
         $counts = array_fill(0, $slugCount * $days, 0);
+        $slugKeyOffset = self::DATE_LEN + self::COMMA_LEN + $slugKeyLen;
         while (!feof($fp)) {
             $chunk = fread($fp, 1_048_576);
 
             $lastNewline = strrpos($chunk, "\n");
 
-            $pos = self::URI_PREFIX_LEN;
-            while ($pos < $lastNewline) {
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-
-                if ($pos >= $lastNewline) break;
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
-            }
-
-            while ($pos < $lastNewline) {
-                $comma = strpos($chunk, ',', $pos);
-                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + self::COMMA_LEN + self::DATE_LEN + self::NEWLINE_LEN + self::URI_PREFIX_LEN;
+            $pos = $lastNewline;
+            while ($pos > self::URI_PREFIX_LEN) {
+                $slugId = $slugIds[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
+                $counts[$slugId + $dateIds[substr($chunk, $pos - (self::DATE_LEN - 3), 7)]]++;
+                $pos -= self::DATE_LEN + self::COMMA_LEN + $slugLengths[$slugId] + self::URI_PREFIX_LEN + self::NEWLINE_LEN;
             }
 
             $leftover = strlen($chunk) - $lastNewline - 1;
@@ -156,7 +125,8 @@ final class Parser
         foreach ($slugSorted as $slug) {
             $buffer = $firstSlug ? '' : ',';
             $buffer .= "\n    \"\/blog\/$slug\": {";
-            $s = $slugIds[$slug];
+            $slugKey = substr(self::URI_PREFIX . $slug, -$slugKeyLen);
+            $s = $slugIds[$slugKey];
             $firstDate = true;
             foreach ($dateIds as $date => $d) {
                 $count = $counts[$s + $d];
