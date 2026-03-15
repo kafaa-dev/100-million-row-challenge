@@ -67,15 +67,14 @@ final class Parser
             break;
         }
 
-        $slugIds = [];
-        $slugLengths = [];
+        $slugMap = [];
         foreach ($uris as $i => $uri) {
             $slug = substr($uri, self::URI_PREFIX_LEN);
             $slugId = $i * $days;
-            $slugIds[substr($uri, -$slugKeyLen)] = $slugId;
-            $slugLengths[$slugId] = strlen($slug);
+            $slugMap[substr($uri, -$slugKeyLen)] = (strlen($slug) << 20) | $slugId;
         }
         $slugCount = $i + 1;
+        $slugMask = (1 << 20) - 1; // to get slugId
 
         $slugSorted = [];
         $slugSortedCount = 0;
@@ -106,9 +105,9 @@ final class Parser
 
             $pos = $lastNewline;
             while ($pos > self::URI_PREFIX_LEN) {
-                $slugId = $slugIds[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
-                $counts[$slugId + $dateIds[substr($chunk, $pos - (self::DATE_LEN - 3), 7)]]++;
-                $pos -= self::DATE_LEN + self::COMMA_LEN + $slugLengths[$slugId] + self::URI_PREFIX_LEN + self::NEWLINE_LEN;
+                $s = $slugMap[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
+                $counts[($s & $slugMask) + $dateIds[substr($chunk, $pos - (self::DATE_LEN - 3), 7)]]++;
+                $pos -= self::DATE_LEN + self::COMMA_LEN + ($s >> 20) + self::URI_PREFIX_LEN + self::NEWLINE_LEN;
             }
 
             $leftover = strlen($chunk) - $lastNewline - 1;
@@ -126,10 +125,10 @@ final class Parser
             $buffer = $firstSlug ? '' : ',';
             $buffer .= "\n    \"\/blog\/$slug\": {";
             $slugKey = substr(self::URI_PREFIX . $slug, -$slugKeyLen);
-            $s = $slugIds[$slugKey];
+            $s = $slugMap[$slugKey];
             $firstDate = true;
             foreach ($dateIds as $date => $d) {
-                $count = $counts[$s + $d];
+                $count = $counts[($s & $slugMask) + $d];
                 if ($count === 0) continue;
                 $buffer .= $firstDate ? '' : ',';
                 $buffer .= "\n        \"202$date\": $count";
