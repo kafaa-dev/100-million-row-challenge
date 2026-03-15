@@ -156,14 +156,20 @@ final class Parser
             $buffer .= "\n    \"\/blog\/$slug\": {";
             $slugKey = substr(self::URI_PREFIX . $slug, -$slugKeyLen);
             $s = $slugMap[$slugKey];
-            $firstDate = true;
-            foreach ($dateIds as $date => $d) {
-                $count = $counts[($s & 1048575) + $d];
-                if ($count === 0) continue;
-                $buffer .= $firstDate ? '' : ',';
-                $buffer .= "\n        \"202$date\": $count";
 
-                $firstDate = false;
+            $d = reset($dateIds);
+            $date = key($dateIds);
+            $count = $counts[($s & 1048575) + $d];
+            $buffer .= "\n        \"202$date\": $count";
+
+            while (($date = key($dateIds)) !== null) {
+                $d = current($dateIds);
+                $count = $counts[($s & 1048575) + $d];
+                if ($count !== 0) {
+                    $buffer .= ",\n        \"202$date\": $count";
+                }
+
+                next($dateIds);
             }
             $buffer .= "\n    }";
             fwrite($fp, $buffer);
