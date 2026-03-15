@@ -108,6 +108,16 @@ final class Parser
                 $s = $slugMap[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
                 $counts[($s & 1048575) + $dateIds[substr($chunk, $pos - 22, 7)]]++;
                 $pos -= 52 + ($s >> 20);
+
+                if ($pos <= 25) break;
+                $s = $slugMap[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
+                $counts[($s & 1048575) + $dateIds[substr($chunk, $pos - 22, 7)]]++;
+                $pos -= 52 + ($s >> 20);
+
+                if ($pos <= 25) break;
+                $s = $slugMap[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
+                $counts[($s & 1048575) + $dateIds[substr($chunk, $pos - 22, 7)]]++;
+                $pos -= 52 + ($s >> 20);
             }
 
             $leftover = strlen($chunk) - $lastNewline - 1;
