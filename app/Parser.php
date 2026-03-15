@@ -48,7 +48,7 @@ final class Parser
 
         $slugIds = [];
         foreach (Visit::all() as $i => $visit) {
-            $slugIds[substr($visit->uri, 28)] = $i * $days;
+            $slugIds[substr($visit->uri, 25)] = $i * $days;
         }
         $slugCount = $i + 1;
 
@@ -78,62 +78,62 @@ final class Parser
 
             $lastNewline = strrpos($chunk, "\n");
 
-            $pos = 28;
+            $pos = 25;
             while ($pos < $lastNewline) {
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
 
                 if ($pos >= $lastNewline) break;
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
             }
 
             while ($pos < $lastNewline) {
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
-                $pos = $comma + 55;
+                $pos = $comma + 52;
             }
 
             $leftover = strlen($chunk) - $lastNewline - 1;
@@ -150,7 +150,7 @@ final class Parser
         foreach ($slugSorted as $slug) {
             $buffer = $firstSlug ? '' : ',';
             $buffer .= "\n    \"\/blog\/$slug\": {";
-            $s = $slugIds[substr($slug, 3)];
+            $s = $slugIds[$slug];
             $firstDate = true;
             foreach ($dateIds as $date => $d) {
                 $count = $counts[$s + $d];
