@@ -70,7 +70,6 @@ final class Parser
             $slugMap[substr($uri, -$slugKeyLen)] = (strlen($slug) << 20) | $slugId;
         }
         $slugCount = $i + 1;
-        $slugMask = (1 << 20) - 1; // to get slugId
 
         $slugSorted = [];
         $slugSortedCount = 0;
@@ -102,7 +101,12 @@ final class Parser
             $pos = $lastNewline;
             while ($pos > 25) {
                 $s = $slugMap[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
-                $counts[($s & $slugMask) + $dateIds[substr($chunk, $pos - 22, 7)]]++;
+                $counts[($s & 1048575) + $dateIds[substr($chunk, $pos - 22, 7)]]++;
+                $pos -= 52 + ($s >> 20);
+
+                if ($pos <= 25) break;
+                $s = $slugMap[substr($chunk, $pos - $slugKeyOffset, $slugKeyLen)];
+                $counts[($s & 1048575) + $dateIds[substr($chunk, $pos - 22, 7)]]++;
                 $pos -= 52 + ($s >> 20);
             }
 
@@ -124,7 +128,7 @@ final class Parser
             $s = $slugMap[$slugKey];
             $firstDate = true;
             foreach ($dateIds as $date => $d) {
-                $count = $counts[($s & $slugMask) + $d];
+                $count = $counts[($s & 1048575) + $d];
                 if ($count === 0) continue;
                 $buffer .= $firstDate ? '' : ',';
                 $buffer .= "\n        \"202$date\": $count";
