@@ -18,6 +18,7 @@ use function stream_set_read_buffer;
 use function stream_set_write_buffer;
 use function strlen;
 use function strpos;
+use function strrpos;
 use function substr;
 
 use const SEEK_CUR;
@@ -74,15 +75,16 @@ final class Parser
         while (!feof($fp)) {
             $chunk = fread($fp, 1_048_576);
 
-            $start = 0;
-            while (($pos = strpos($chunk, "\n", $start)) !== false) {
-                $comma = strpos($chunk, ',', $start);
-                $counts[$slugIds[substr($chunk, $start + 28, $comma - $start - 28)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
+            $lastNewline = strrpos($chunk, "\n");
 
-                $start = $pos + 1;
+            $pos = 28;
+            while ($pos < $lastNewline) {
+                $comma = strpos($chunk, ',', $pos);
+                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
+                $pos = $comma + 55;
             }
 
-            $leftover = strlen($chunk) - $start;
+            $leftover = strlen($chunk) - $lastNewline - 1;
             if ($leftover > 0) {
                 fseek($fp, -$leftover, SEEK_CUR);
             }
