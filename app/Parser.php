@@ -118,6 +118,16 @@ final class Parser
                 $comma = strpos($chunk, ',', $pos);
                 $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
                 $pos = $comma + 55;
+
+                if ($pos >= $lastNewline) break;
+                $comma = strpos($chunk, ',', $pos);
+                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
+                $pos = $comma + 55;
+
+                if ($pos >= $lastNewline) break;
+                $comma = strpos($chunk, ',', $pos);
+                $counts[$slugIds[substr($chunk, $pos, $comma - $pos)] + $dateIds[substr($chunk, $comma + 4, 7)]]++;
+                $pos = $comma + 55;
             }
 
             while ($pos < $lastNewline) {
