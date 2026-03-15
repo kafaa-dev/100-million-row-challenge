@@ -79,7 +79,7 @@ final class Parser
         $sample = fread($fp, 181_000);
         $lastNewline = strrpos($sample, "\n");
         $pos = 25;
-        while ($pos < $lastNewline) {
+        while ($pos < $lastNewline && $slugSortedCount !== $slugCount) {
             $comma = strpos($sample, ',', $pos);
             $slug = substr($sample, $pos, $comma - $pos);
             $pos = $comma + 52;
