@@ -57,15 +57,17 @@ final class Parser
         $slugSortedCount = 0;
         $fp = fopen($inputPath, 'r');
         stream_set_read_buffer($fp, 0);
-        while ($line = fgets($fp)) {
-            $slug = substr($line, 25, -27);
+
+        $sample = fread($fp, 106_376);
+        $lastNewline = strrpos($sample, "\n");
+        $pos = 25;
+        while ($pos < $lastNewline) {
+            $comma = strpos($sample, ',', $pos);
+            $slug = substr($sample, $pos, $comma - $pos);
+            $pos = $comma + 52;
 
             if (!isset($slugSorted[$slug])) {
                 $slugSorted[$slug] = $slugSortedCount++;
-            }
-
-            if ($slugSortedCount === $slugCount) {
-                break;
             }
         }
         $slugSorted = array_flip($slugSorted);
